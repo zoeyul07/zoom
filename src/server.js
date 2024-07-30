@@ -25,17 +25,21 @@ const server = http.createServer(app);
 //같은 서버에서 http, websocket을 둘다 동작 시킨다.
 const wss = new WebSocket.Server({ server });
 
+//서버가 연결되면 커넥션을 저장한다.
+const sockets = [];
 //wss는 전체 서버이고, socket은 백엔드와 연결된 브라우저
 //socket은 브라우저와의 contact 라인
 //연결된 유저, 저장해야함
 wss.on("connection", (socket) => {
   //서버에서 소켓은 연결된 브라우저
   console.log("connected to browser");
+  sockets.push(socket);
   socket.on("close", () => {
     console.log("disconnected from the browser");
   });
   socket.on("message", (message) => {
-    console.log(message);
+    message = message.toString("utf-8");
+    sockets.forEach((aSocket) => aSocket.send(message));
   });
   socket.send("hello!");
 });
