@@ -34,12 +34,22 @@ wss.on("connection", (socket) => {
   //서버에서 소켓은 연결된 브라우저
   console.log("connected to browser");
   sockets.push(socket);
+  socket["nickname"] = "Anon";
   socket.on("close", () => {
     console.log("disconnected from the browser");
   });
-  socket.on("message", (message) => {
-    message = message.toString("utf-8");
-    sockets.forEach((aSocket) => aSocket.send(message));
+  socket.on("message", (msg) => {
+    msg = msg.toString("utf-8");
+    const message = JSON.parse(msg);
+    switch (message.type) {
+      case "new_message":
+        sockets.forEach((aSocket) =>
+          aSocket.send(`${socket.nickname}: ${message.payload}`)
+        );
+      case "nickname":
+        //socket안에 데이터를 저장할 수 있음
+        socket["nickname"] = message.payload;
+    }
   });
   socket.send("hello!");
 });
