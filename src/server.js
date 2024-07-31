@@ -1,6 +1,6 @@
 import express from "express";
 import http from "http";
-import WebSocket from "ws";
+import SocketIO from "socket.io";
 
 const app = express();
 
@@ -17,41 +17,35 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 const handleListen = () => console.log(`Listening on http://localhost:3000`);
-//listen
-// app.listen(3000, handleListen);
 
-//server 위에서 websocket을 만들 수 있다.
-const server = http.createServer(app);
-//같은 서버에서 http, websocket을 둘다 동작 시킨다.
-const wss = new WebSocket.Server({ server });
+const httpServer = http.createServer(app);
 
-//서버가 연결되면 커넥션을 저장한다.
-const sockets = [];
-//wss는 전체 서버이고, socket은 백엔드와 연결된 브라우저
-//socket은 브라우저와의 contact 라인
-//연결된 유저, 저장해야함
-wss.on("connection", (socket) => {
-  //서버에서 소켓은 연결된 브라우저
-  console.log("connected to browser");
-  sockets.push(socket);
+//socket.io가 url을 줌 (http://localhost:3000/socket.io/socket.io.js)
+const wsServer = SocketIO(httpServer);
+
+wsServer.on("connection", (socket) => {
   socket["nickname"] = "Anon";
-  socket.on("close", () => {
-    console.log("disconnected from the browser");
+  //all event in socket
+  socket.onAny((event) => {
+    console.log(`SocketEvent:  ${event}`);
   });
-  socket.on("message", (msg) => {
-    msg = msg.toString("utf-8");
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname}: ${message.payload}`)
-        );
-      case "nickname":
-        //socket안에 데이터를 저장할 수 있음
-        socket["nickname"] = message.payload;
-    }
+  socket.on("enter_room", (roomName, done) => {
+    socket.join(roomName);
+    done();
+    socket.to(roomName).emit("welcome", socket.nickname);
+    socket.on("disconnecting", () => {
+      socket.rooms.forEach((room) =>
+        socket.to(room).emit("bye", socket.nickname)
+      );
+    });
+
+    socket.on("new_message", (msg, room, done) => {
+      socket.to(room).emit("new_message", `${socket.nickname}: ${msg}`);
+      done();
+    });
+
+    socket.on("nickname", (nickname) => (socket["nickname"] = nickname));
   });
-  socket.send("hello!");
 });
 
-server.listen(3000, handleListen);
+httpServer.listen(3000, handleListen);
