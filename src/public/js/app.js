@@ -21,6 +21,7 @@ function handleMessageSubmit(event) {
   event.preventDefault();
   const input = room.querySelector("#msg input");
   const value = input.value;
+
   socket.emit("new_message", value, roomName, () => {
     addMessage(`You: ${value}`);
   });
@@ -35,6 +36,7 @@ function handleNicknameSubmit(event) {
   socket.emit("nickname", value);
   input.value = "";
 }
+
 function showRoom() {
   welcome.hidden = true;
   room.hidden = false;
@@ -52,7 +54,7 @@ function handleRoomSubmit(event) {
   const input = form.querySelector("input");
   //callback은 서버에서 호출되지만 내부 로직은 프론트에서 실행된다.
   //callback은 마지막 argument 여야함
-  socket.emit("enter_room", { payload: input.value }, showRoom);
+  socket.emit("enter_room", input.value, showRoom);
   roomName = input.value;
   input.value = "";
 }
@@ -60,11 +62,15 @@ function handleRoomSubmit(event) {
 form.addEventListener("submit", handleRoomSubmit);
 //socket.io에서 모든 유저는 socket과 private 룸이 있다.
 
-socket.on("welcome", (user) => {
+socket.on("welcome", (user, newCount) => {
+  const h3 = room.querySelector("h3");
+  h3.innerText = `room ${roomName} (${newCount})`;
   addMessage(`${user} arrived`);
 });
 
-socket.on("bye", (left) => {
+socket.on("bye", (left, newCount) => {
+  const h3 = room.querySelector("h3");
+  h3.innerText = `room ${roomName} (${newCount})`;
   addMessage(`${left} left`);
 });
 

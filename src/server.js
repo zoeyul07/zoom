@@ -33,10 +33,14 @@ function publicRooms() {
   rooms.forEach((_, key) => {
     console.log("key", key);
     if (sids.get(key) === undefined) {
-      publicRooms.push(key.payload);
+      publicRooms.push(key);
     }
   });
   return publicRooms;
+}
+
+function countRooms(roomName) {
+  return wsServer.sockets.adapter.rooms.get(roomName)?.size;
 }
 
 //현재는 데이터베이스에 저장하지 않고 메모리 adapter를 사용하고 있다.
@@ -62,7 +66,7 @@ wsServer.on("connection", (socket) => {
     socket.join(roomName);
     done();
     //send message to one socket
-    socket.to(roomName).emit("welcome", socket.nickname);
+    socket.to(roomName).emit("welcome", socket.nickname, countRooms(roomName));
     //send message to all socket
     wsServer.sockets.emit("room_change", publicRooms());
   });
@@ -70,7 +74,7 @@ wsServer.on("connection", (socket) => {
   //socket이 방을 떠나기 직전에 발생한다. 아직 떠난게 아님
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
-      socket.to(room).emit("bye", socket.nickname)
+      socket.to(room).emit("bye", socket.nickname, countRooms(room) - 1)
     );
   });
 
