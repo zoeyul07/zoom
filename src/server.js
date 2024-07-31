@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
-import SocketIO from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 
 const app = express();
 
@@ -21,7 +22,13 @@ const handleListen = () => console.log(`Listening on http://localhost:3000`);
 const httpServer = http.createServer(app);
 
 //socket.io가 url을 줌 (http://localhost:3000/socket.io/socket.io.js)
-const wsServer = SocketIO(httpServer);
+const wsServer = new Server(httpServer, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true,
+  },
+});
+instrument(wsServer, { auth: false });
 
 function publicRooms() {
   const {

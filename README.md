@@ -17,6 +17,7 @@ Zoom Clone using Nodejs, WebRTC and Websockets
   - 채팅룸 exit 시 알림
   - 새로운 채팅방 생성 혹은 삭제될 경우 알림
   - 채팅방 들어오고 나갈때마다 user 수 알림
+- socket.io admin panel 연동
 
 ### 파일 구조
 
