@@ -11,6 +11,10 @@ Zoom Clone using Nodejs, WebRTC and Websockets
 
 - websocket을 이용한 간단한 채팅 기능 구현 (feature/websocket)
 - socket.io를 이용한 채팅룸 구현(main)
+  - 채팅룸 생성 및 join
+  - 채팅룸 join 시 알림
+  - 채팅룸 내에 닉네임과 메세지 알림
+  - 채팅룸 exit 시 알림
 
 ### 파일 구조
 
