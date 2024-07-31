@@ -10,14 +10,18 @@ Zoom Clone using Nodejs, WebRTC and Websockets
 - 작성한 코드를 일반 Nodejs 코드로 컴파일 해주도록 babel 사용
 
 - websocket을 이용한 간단한 채팅 기능 구현 (feature/websocket)
-- socket.io를 이용한 채팅룸 구현(main)
+- socket.io를 이용한 채팅룸 구현(feature/socketio)
   - 채팅룸 생성 및 join
   - 채팅룸 join 시 알림
   - 채팅룸 내에 닉네임과 메세지 알림
   - 채팅룸 exit 시 알림
   - 새로운 채팅방 생성 혹은 삭제될 경우 알림
   - 채팅방 들어오고 나갈때마다 user 수 알림
-- socket.io admin panel 연동
+  - socket.io admin panel 연동
+- video call
+  - 소리 켜기 & 끄기 기능
+  - 카메라 켜기 & 끄기 기능
+  - 카메라 리스트를 통해 선택된 카메라 바꾸기
 
 ### 파일 구조
 
