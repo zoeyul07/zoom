@@ -14,6 +14,9 @@ html(lang="en")
           input(placeholder="room name", required, type="text")
           button Enter Room
 
+        h4 OpenRooms:
+        ul
+
       div#room   
         h3
         ul
@@ -21,7 +24,7 @@ html(lang="en")
           input(placeholder="nickname", required, type="text")
           button Send
 
-        form#mgs
+        form#msg
           input(placeholder="message", required, type="text")
           button Send
     script(src="/socket.io/socket.io.js")

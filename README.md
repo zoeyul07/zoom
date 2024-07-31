@@ -15,6 +15,7 @@ Zoom Clone using Nodejs, WebRTC and Websockets
   - 채팅룸 join 시 알림
   - 채팅룸 내에 닉네임과 메세지 알림
   - 채팅룸 exit 시 알림
+  - 새로운 채팅방 생성 혹은 삭제될 경우 알림
 
 ### 파일 구조
 
