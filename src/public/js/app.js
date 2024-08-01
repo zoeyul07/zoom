@@ -169,7 +169,20 @@ socket.on("ice", (ice) => {
 //RTC code
 function makeConnection() {
   //브라우저 사이에 peerConnection을 만든다
-  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection = new RTCPeerConnection({
+    iceServers: [
+      {
+        //  google에서 제공하는 테스트 서버
+        urls: [
+          "stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302",
+          "stun:stun3.l.google.com:19302",
+          "stun:stun4.l.google.com:19302",
+        ],
+      },
+    ],
+  });
   myPeerConnection.addEventListener("icecandidate", handleIce);
   myPeerConnection.addEventListener("addstream", handleAddStream);
   //peerConnection에 audio, video track을 추가한다.
