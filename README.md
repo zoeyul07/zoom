@@ -24,6 +24,7 @@ Zoom Clone using Nodejs, WebRTC and Websockets
   - 소리 켜기 & 끄기 기능
   - 카메라 켜기 & 끄기 기능
   - 카메라 리스트를 통해 선택된 카메라 바꾸기
+  - 내 카메라 화면과 상대방 카메라 화면 한페이지에 같이 띄우기
 
 ### 파일 구조
 
