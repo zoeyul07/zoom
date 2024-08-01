@@ -88,7 +88,19 @@ function handleCameraClick() {
 }
 
 async function handleCameraChange() {
+  //when change camera, create new stream with difference device id
   await getMedia(camerasSelect.value);
+  if (peerConnection) {
+    //카메라 변경후 업데이트된 비디오 트랙을 갖고오게된다.
+    const videoTrack = myStream.getVideoTracks()[0];
+    //sender-peer로 보내진 media stream track을 컨트롤하게 해준다.
+    //우리의 stream은 track이 있다. 그리고 가끔 우리의 stream을 음소거할수도 있고, Peer to peer connection의 track을 변경할수도 있다.
+    const videoSender = myPeerConnection
+      .getSenders()
+      .find((sender) => sender.track.kind === "video");
+
+    videoSender.replaceTrack(videoTrack);
+  }
 }
 
 muteBtn.addEventListener("click", handleMuteClick);
