@@ -12,6 +12,7 @@ let myStream;
 let muted = false;
 let cameraOff = false;
 let roomName;
+let myPeerConnection;
 
 async function getCameras() {
   try {
@@ -98,16 +99,20 @@ camerasSelect.addEventListener("input", handleCameraChange);
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form");
 
-function startMedia() {
+//두브라우저에서 모두 돌아가는 코드
+async function initCall() {
   welcome.hidden = true;
   call.hidden = false;
-  getMedia();
+  await getMedia();
+  makeConnection();
 }
 
-function handleWelcomeSubmit(event) {
+async function handleWelcomeSubmit(event) {
   event.preventDefault();
   const input = welcomeForm.querySelector("input");
-  socket.emit("join_room", input.value, startMedia);
+  //Websocket의 속도가 media를 가져오는 속도나 연결을 만드는 속도보다 빠를 수 있다.
+  await initCall();
+  socket.emit("join_room", input.value);
   roomName = input.value;
   input.value = "";
 }
@@ -115,6 +120,67 @@ function handleWelcomeSubmit(event) {
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 //Socket code
-socket.on("welcome", () => {
-  console.log("someone join");
+
+//peer A - createOffer, send offer to peer B
+//runs in peer A
+socket.on("welcome", async () => {
+  //알림을 받는 브라우저에서 실행됨
+  const offer = await myPeerConnection.createOffer();
+  myPeerConnection.setLocalDescription(offer);
+  socket.emit("offer", offer, roomName);
+  console.log("sent the offer");
 });
+
+//receive offer
+//runs in peer B
+socket.on("offer", async (offer) => {
+  console.log("received the offer");
+  //setRemoteDescription - description of my peer
+  myPeerConnection.setRemoteDescription(offer);
+  const answer = await myPeerConnection.createAnswer();
+  myPeerConnection.setLocalDescription(answer);
+  socket.emit("answer", answer, roomName);
+  console.log("sent the answer");
+});
+
+//runs in peer A
+socket.on("answer", (answer) => {
+  console.log("received the answer");
+  myPeerConnection.setRemoteDescription(answer);
+});
+
+socket.on("ice", (ice) => {
+  console.log("received candidate");
+  myPeerConnection.addIceCandidate(ice);
+});
+
+//RTC code
+function makeConnection() {
+  //브라우저 사이에 peerConnection을 만든다
+  myPeerConnection = new RTCPeerConnection();
+  myPeerConnection.addEventListener("icecandidate", handleIce);
+  myPeerConnection.addEventListener("addstream", handleAddStream);
+  //peerConnection에 audio, video track을 추가한다.
+  //각 브라우저들을 따로 구성만 하고 아직 연결하지는 않은 상태
+  myStream
+    .getTracks()
+    .forEach((track) => myPeerConnection.addTrack(track, myStream));
+}
+
+/*offer와 answer가 모두 끝나면 peer-to-peer 연결의 양쪽에서 icecandidate(internet connectivity establishment, 인터넷 결결 생성)라는 이벤트를 실행한다.
+icecandidate은 webRTC에 필요한 프로토콜로 멀리 떨어진 장치와 소통할 수 있게 한다.
+브라우저가 서로 소통할 수 있게 한다. 중재 프로세스
+Candidate들이 각각의 연결에서 제안되고, 서로의 동의하에 하나를 선택한하고 소통 방식에 사용한다.
+ */
+
+function handleIce(data) {
+  console.log("sent candidate");
+  socket.emit("ice", data.candidate, roomName);
+}
+
+//data=peer's stream
+function handleAddStream(data) {
+  const peerFace = document.getElementById("peerFace");
+  peerFace.srcObject = data.stream;
+  console.log("got an event from my peer");
+}
