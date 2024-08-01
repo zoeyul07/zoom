@@ -28,6 +28,7 @@ Zoom Clone using Nodejs, WebRTC and Websockets
   - 카메라 변경시 상대방 화면에서도 카메라가 변경되어 보이도록
   - localtunnel을 이용해 휴대폰에서도 접속할 수 있도록
   - 같은 wifi가 아니어도 접속할 수 있도록 stun server 사용
+- 간단한 데이터채널 연동 및 테스트(feature/data-channel)
 
 ### 파일 구조
 
