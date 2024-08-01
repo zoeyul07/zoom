@@ -26,6 +26,7 @@ Zoom Clone using Nodejs, WebRTC and Websockets
   - 카메라 리스트를 통해 선택된 카메라 바꾸기
   - 내 카메라 화면과 상대방 카메라 화면 한페이지에 같이 띄우기
   - 카메라 변경시 상대방 화면에서도 카메라가 변경되어 보이도록
+  - localtunnel을 이용해 휴대폰에서도 접속할 수 있도록
 
 ### 파일 구조
 
